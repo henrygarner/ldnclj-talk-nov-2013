@@ -7,9 +7,13 @@
 #+OPTIONS: num:nil toc:nil reveal_mathjax:t
 #+REVEAL_TRANS: cube
 
-* The creative process
-[[./images/the-creative-process.gif]]
-* Dojo #1
+* Dojo #1 - Multisnake
+
+Dave Snowdon, Nikita Beloglazov
+
+[[https://github.com/davesnowdon/multisnake]]
+
+[[./images/multisnake.png]]
 
 * Torus Pong
 A Clojure Cup 2013 contribution by:
@@ -20,16 +24,18 @@ https://github.com/uswitch/torus-pong
 
 [[./images/pong_med.png]]
 
-* Multisnake
-  
-Dave Snowdon, Nikita Beloglazov
-
-[[https://github.com/davesnowdon/multisnake]]
-
-[[./images/multisnake.png]]
-
-* Massive Multiplayer Online 3D Snake!
+* Dojo #2 - THREE.js
+  [[./images/threejs.png]]
+* Massive Multiplayer Online 3D Snake
   [[./images/snake-3d.png]]
+* Demo
+  
+  Network: SMEX4
+
+  [[http://192.168.11.177:8080]]
+
+  - Snake: arrow keys
+  - View: a, s, d
 * State machine
   [[./images/game-state.png]]
 
@@ -57,11 +63,14 @@ Dave Snowdon, Nikita Beloglazov
   #+END_HTML
 * On the client
  #+BEGIN_HTML
-  <pre><code data-trim class="clojure">
-  {:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
-             :dir [0 1 0]
-             :id 4
-             :orientation 1}]
+ <pre><code data-trim class="clojure">
+ ;; All clients receive (almost) the same game state
+
+ {:player-id 4
+  :snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
+            :dir [0 1 0]
+            :id 4
+            :orientation 1}]
    :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
   </code></pre>
   #+END_HTML
@@ -77,9 +86,6 @@ Dave Snowdon, Nikita Beloglazov
             (recur new-arena))))
 </code></pre>
   #+END_HTML 
-* Dojo #2
-* Three.js
-  [[./images/threejs.png]]
 * Minecraft - Voxels
   [[./images/Minecraft-360.jpg]]
 * Three.js components
@@ -125,14 +131,16 @@ Dave Snowdon, Nikita Beloglazov
 * Orthographic Camera
   [[./images/ortho.png]]
 * Foreign Libs
-  #+BEGIN_HTML
-  <pre><code data-trim class="clojure">
-;; Inside project.clj
 
+  #+BEGIN_HTML
+  
+<pre><code data-trim class="clojure">
+;; Inside project.clj
+  
 :foreign-libs [{:file "resources/public/three.max.js"
-              :provides ["three"]}
-             {:file "resources/public/tween.max.js"
-              :provides ["tween"]}]
+                :provides ["three"]}
+               {:file "resources/public/tween.max.js"
+                :provides ["tween"]}]
 
 ;; Inside cljs source
 
@@ -140,9 +148,11 @@ Dave Snowdon, Nikita Beloglazov
   (:require [three]
             [tween]))
 </code></pre>
-#+END_HTML
+  #+END_HTML
+
 * Advanced mode
-  #+BEGIN_HTML
+  
+#+BEGIN_HTML
   <pre><code data-trim class="clojure">
   ;; Inside project.clj
   
@@ -167,6 +177,7 @@ Dave Snowdon, Nikita Beloglazov
   3. 130K  pruned + gzipped
   
 * Thank You
+  [[https://github.com/henrygarner/multisnake]]
   [[https://github.com/henrygarner/ldnclj-talk-nov-2013]]
   [[./images/henrygarner.jpeg]]
 

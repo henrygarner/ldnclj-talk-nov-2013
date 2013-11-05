@@ -22,20 +22,20 @@
 <section>
 <section id="sec-1" >
 
-<h2>The creative process</h2>
-<img src="./images/the-creative-process.gif" alt="the-creative-process.gif" />
-</section>
+<h2>Dojo #1 - Multisnake</h2>
+<p>
+Dave Snowdon, Nikita Beloglazov
+</p>
 
+<p>
+<a href="https://github.com/davesnowdon/multisnake">https://github.com/davesnowdon/multisnake</a>
+</p>
+
+<img src="./images/multisnake.png" alt="multisnake.png" />
+</section>
 </section>
 <section>
 <section id="sec-2" >
-
-<h2>Dojo #1</h2>
-</section>
-
-</section>
-<section>
-<section id="sec-3" >
 
 <h2>Torus Pong</h2>
 <p>
@@ -54,25 +54,39 @@ Jon Neale, Paul Lam, Thomas Kristensen, Ragnar Dahlen
 </section>
 </section>
 <section>
+<section id="sec-3" >
+
+<h2>Dojo #2 - THREE.js</h2>
+<img src="./images/threejs.png" alt="threejs.png" />
+</section>
+
+</section>
+<section>
 <section id="sec-4" >
 
-<h2>Multisnake</h2>
-<p>
-Dave Snowdon, Nikita Beloglazov
-</p>
-
-<p>
-<a href="https://github.com/davesnowdon/multisnake">https://github.com/davesnowdon/multisnake</a>
-</p>
-
-<img src="./images/multisnake.png" alt="multisnake.png" />
+<h2>Massive Multiplayer Online 3D Snake</h2>
+<img src="./images/snake-3d.png" alt="snake-3d.png" />
 </section>
+
 </section>
 <section>
 <section id="sec-5" >
 
-<h2>Massive Multiplayer Online 3D Snake</h2>
-<img src="./images/snake-3d.png" alt="snake-3d.png" />
+<h2>Demo</h2>
+<p>
+Network: SMEX4
+</p>
+
+<p>
+<a href="http://192.168.11.177:8080">http://192.168.11.177:8080</a>
+</p>
+
+<ul class="org-ul">
+<li>Snake: arrow keys
+</li>
+<li>View: a, s, d
+</li>
+</ul>
 </section>
 
 </section>
@@ -118,12 +132,15 @@ Dave Snowdon, Nikita Beloglazov
 
 <h2>On the client</h2>
 <pre><code data-trim class="clojure">
-{:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
+;; All clients receive (almost) the same game state
+
+{:player-id 4
+ :snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
            :dir [0 1 0]
            :id 4
            :orientation 1}]
- :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
-</code></pre>
+  :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
+ </code></pre>
 
 <pre><code data-trim class="clojure">
   (go (loop [previous-arena (make-arena quaternion)]
@@ -140,27 +157,13 @@ Dave Snowdon, Nikita Beloglazov
 <section>
 <section id="sec-10" >
 
-<h2>Dojo #2</h2>
-</section>
-</section>
-<section>
-<section id="sec-11" >
-
-<h2>Three.js</h2>
-<img src="./images/threejs.png" alt="threejs.png" />
-</section>
-
-</section>
-<section>
-<section id="sec-12" >
-
 <h2>Minecraft - Voxels</h2>
 <img src="./images/Minecraft-360.jpg" alt="Minecraft-360.jpg" />
 </section>
 
 </section>
 <section>
-<section id="sec-13" >
+<section id="sec-11" >
 
 <h2>Three.js components</h2>
 <ul class="org-ul">
@@ -177,7 +180,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-14" >
+<section id="sec-12" >
 
 <h2>Three.js components</h2>
   <pre><code data-trim class="clojure">
@@ -210,7 +213,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-15" >
+<section id="sec-13" >
 
 <h2>Fez - Trixels</h2>
 <img src="./images/fez.png" alt="fez.png" />
@@ -218,7 +221,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-16" >
+<section id="sec-14" >
 
 <h2>Orthographic Camera</h2>
 <img src="./images/ortho.png" alt="ortho.png" />
@@ -226,16 +229,17 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-17" >
+<section id="sec-15" >
 
 <h2>Foreign Libs</h2>
-  <pre><code data-trim class="clojure">
+  
+<pre><code data-trim class="clojure">
 ;; Inside project.clj
-
+  
 :foreign-libs [{:file "resources/public/three.max.js"
-              :provides ["three"]}
-             {:file "resources/public/tween.max.js"
-              :provides ["tween"]}]
+                :provides ["three"]}
+               {:file "resources/public/tween.max.js"
+                :provides ["tween"]}]
 
 ;; Inside cljs source
 
@@ -244,10 +248,9 @@ Dave Snowdon, Nikita Beloglazov
             [tween]))
 </code></pre>
 </section>
-
 </section>
 <section>
-<section id="sec-18" >
+<section id="sec-16" >
 
 <h2>Advanced mode</h2>
 <pre><code data-trim class="clojure">
@@ -277,10 +280,11 @@ WARNING: 0 error(s), 19,434 warning(s)
 </section>
 </section>
 <section>
-<section id="sec-19" >
+<section id="sec-17" >
 
 <h2>Thank You</h2>
 <p>
+<a href="https://github.com/henrygarner/multisnake">https://github.com/henrygarner/multisnake</a>
 <a href="https://github.com/henrygarner/ldnclj-talk-nov-2013">https://github.com/henrygarner/ldnclj-talk-nov-2013</a>
 <img src="./images/henrygarner.jpeg" alt="henrygarner.jpeg" />
 </p>
