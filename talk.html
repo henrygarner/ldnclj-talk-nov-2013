@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>(Clojurescript + Three.js)</title>
+<link rel="stylesheet" href="./reveal.js/css/reveal.min.css"/>
+<link rel="stylesheet" href="./reveal.js/css/theme/solarized.css" id="theme"/>
+<link rel="stylesheet" href="css/zenburn.css"/>
+<link rel="stylesheet" href="./reveal.js/css/print/pdf.css" type="text/css" media="print"/>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1>Clojurescript + Three.js</h1>
+<h2></h2>
+<h2><a href="mailto:@henrygarner">@henrygarner</a></h2>
+<h2></h2></section>
+
+<section>
+<section id="sec-1" >
+
+<h2>The creative process</h2>
+<img src="./images/the-creative-process.gif" alt="the-creative-process.gif" />
+</section>
+
+</section>
+<section>
+<section id="sec-2" >
+
+<h2>Dojo #1</h2>
+</section>
+
+</section>
+<section>
+<section id="sec-3" >
+
+<h2>Torus Pong</h2>
+<p>
+A Clojure Cup 2013 contribution by:
+</p>
+
+<p>
+Jon Neale, Paul Lam, Thomas Kristensen, Ragnar Dahlen
+</p>
+
+<p>
+<a href="https://github.com/uswitch/torus-pong">https://github.com/uswitch/torus-pong</a>
+</p>
+
+<img src="./images/pong_med.png" alt="pong_med.png" />
+</section>
+</section>
+<section>
+<section id="sec-4" >
+
+<h2>Multisnake</h2>
+<p>
+Dave Snowdon, Nikita Beloglazov
+</p>
+
+<p>
+<a href="https://github.com/davesnowdon/multisnake">https://github.com/davesnowdon/multisnake</a>
+</p>
+
+<img src="./images/multisnake.png" alt="multisnake.png" />
+</section>
+</section>
+<section>
+<section id="sec-5" >
+
+<h2>State machine</h2>
+<img src="./images/game-state.png" alt="game-state.png" />
+</section>
+</section>
+<section>
+<section id="sec-6" >
+
+<h2>Multi-client</h2>
+<img src="./images/game-state-2.png" alt="game-state-2.png" />
+</section>
+</section>
+<section>
+<section id="sec-7" >
+
+<h2>Game Tick</h2>
+<pre><code data-trim class="clojure">
+(go
+  (loop [game-state game-core/initial-game-state
+         commands   []
+         timer      (timeout (long params/tick-ms))]
+          (let [[v c] (alts! [timer command-chan] :priority true)]
+            (condp = c
+              command-chan (when v
+                             (recur game-state (conj commands v) timer))
+              timer (let [updated-game-state
+                            (game-core/advance game-state commands)]
+                      (>! game-state-channel updated-game-state)
+                      (recur updated-game-state
+                             []
+                             (timeout (long params/tick-ms))))))))
+</code></pre>
+</section>
+
+</section>
+<section>
+<section id="sec-8" >
+
+<h2>Handling Commands</h2>
+<pre><code data-trim class="clojure">
+  (defn advance
+    "Given a game-state and some inputs
+     advance the game-state one tick"
+    [game-state commands]
+    (let [new-game-state (-> game-state
+                             (handle-commands commands))]
+      (update-world new-game-state)))
+  </code></pre>
+</section>
+
+</section>
+<section>
+<section id="sec-9" >
+
+<h2>Dojo #2</h2>
+</section>
+</section>
+<section>
+<section id="sec-10" >
+
+<h2>Three.js</h2>
+<img src="./images/threejs.png" alt="threejs.png" />
+</section>
+
+</section>
+<section>
+<section id="sec-11" >
+
+<h2>Minecraft - Voxels</h2>
+<img src="./images/Minecraft-360.jpg" alt="Minecraft-360.jpg" />
+</section>
+
+</section>
+<section>
+<section id="sec-12" >
+
+<h2>Clojurescript</h2>
+<img src="./images/ndc.png" alt="ndc.png" />
+</section>
+
+</section>
+<section>
+<section id="sec-13" >
+
+<h2>Three components</h2>
+<ul class="org-ul">
+<li>Scene
+</li>
+<li>Mesh
+</li>
+<li>Camera
+</li>
+<li>Renderer (WebGL or Canvas)
+</li>
+</ul>
+</section>
+
+</section>
+<section>
+<section id="sec-14" >
+
+<h2>Meshes</h2>
+  <pre><code data-trim class="clojure">
+(let [scene    (THREE/Scene.)
+      geometry (THREE/CubeGeometry. 10 10 10)
+      material (THREE/MeshBasicMaterial.
+                 (clj->js {:wireframe true :color 0x000000}))]
+  (.add scene (THREE/Mesh. geometry material)))
+</code></pre>
+</section>
+
+</section>
+<section>
+<section id="sec-15" >
+
+<h2>Camera</h2>
+<pre><code data-trim class="clojure">
+;; Frustrum left, right, top, bottom, near and far planes
+
+(let [scene  (THREE/Scene.)
+      camera (THREE/OrthographicCamera. (/ width -2) (/ width 2)
+                                        (/ height 2) (/ height -2)
+                                        1 1000)]
+  (.add scene camera))
+</code></pre>
+</section>
+
+</section>
+<section>
+<section id="sec-16" >
+
+<h2>Renderer</h2>
+<pre><code data-trim class="clojure">
+;; Three.js can render using WebGL or 2D Canvas API
+
+(let [renderer (if (.WebGLRenderingContext js/window)
+                 (THREE/WebGLRenderer.)
+                 (THREE/CanvasRenderer.))]
+  (.render renderer scene camera))
+</code></pre>
+</section>
+
+</section>
+<section>
+<section id="sec-17" >
+
+<h2>Fez - Trixels</h2>
+<img src="./images/fez.png" alt="fez.png" />
+</section>
+
+</section>
+<section>
+<section id="sec-18" >
+
+<h2>Orthographic Camera</h2>
+<img src="./images/ortho.png" alt="ortho.png" />
+</section>
+
+</section>
+<section>
+<section id="sec-19" >
+
+<h2>Tween.js</h2>
+  <pre><code data-trim class="clojure">
+  ;; Use less energy
+
+(defn animate [scene camera renderer]
+  (js/requestAnimationFrame #(animate scene camera renderer))
+  (.render renderer scene camera)
+  (.update js/TWEEN))
+  </code></pre>
+</section>
+
+</section>
+<section>
+<section id="sec-20" >
+
+<h2>Stateless Client</h2>
+<pre><code data-trim class="clojure">
+{:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
+           :dir [0 1 0]
+           :id 4
+           :orientation 1}]
+ :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
+</code></pre>
+</section>
+</section>
+<section>
+<section id="sec-21" >
+
+<h2>Demo</h2>
+<img src="./images/3dsnake.png" alt="3dsnake.png" />
+</section>
+
+</section>
+<section>
+<section id="sec-22" >
+
+<h2>Foreign Libs</h2>
+  <pre><code data-trim class="clojure">
+;; Inside project.clj
+
+:foreign-libs [{:file "resources/public/three.max.js"
+              :provides ["three"]}
+             {:file "resources/public/tween.max.js"
+              :provides ["tween"]}]
+
+;; Inside cljs source
+
+(ns multiplay.views.arena
+  (:require [three]
+            [tween]))
+</code></pre>
+</section>
+
+</section>
+<section>
+<section id="sec-23" >
+
+<h2>Advanced mode</h2>
+<pre><code data-trim class="clojure">
+;; Inside project.clj
+
+:optimizations :advanced
+:externs ["resources/public/three.extern.js"
+          "resources/public/tween.extern.js"]
+</code></pre>
+
+<pre><code data-trim class="bash">
+# lein cljsbuild
+
+com.google.javascript.jscomp.LoggerErrorManager printSummary
+WARNING: 0 error(s), 19,434 warning(s)
+</code></pre>
+
+
+<ol class="org-ol">
+<li>2.0MB raw
+</li>
+<li>650K  pruned
+</li>
+<li>130K  pruned + gzipped
+</li>
+</ol>
+</section>
+</section>
+<section>
+<section id="sec-24" >
+
+<h2>Thank You</h2>
+<p>
+<a href="https://github.com/henrygarner/ldnclj-talk-nov-2013">https://github.com/henrygarner/ldnclj-talk-nov-2013</a>
+<img src="./images/henrygarner.jpeg" alt="henrygarner.jpeg" />
+</p>
+
+<p>
+@henrygarner
+</p>
+
+<p>
+CTO, Likely
+</p>
+</section>
+</section>
+</div>
+</div>
+<script src="./reveal.js/lib/js/head.min.js"></script>
+<script src="./reveal.js/js/reveal.min.js"></script>
+<script>
+
+        		// Full list of configuration options available here:
+        		// https://github.com/hakimel/reveal.js#configuration
+        		Reveal.initialize({
+        			controls: true,
+        			progress: true,
+        			history: false,
+        			center: true,
+        			rollingLinks: false,
+        			keyboard: true,
+        			overview: true,
+        			 // slide width
+        			 // slide height
+        			 // slide margin
+        			 // slide minimum scaling factor
+        			 // slide maximum scaling factor
+
+
+        			theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        			transition: Reveal.getQueryHash().transition || 'cube', // default/cube/page/concave/zoom/linear/fade/none
+        			transitionSpeed: 'default',
+
+        			// Optional libraries used to extend on reveal.js
+        			dependencies: [
+        				{ src: './reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } }
+        				,{ src: './reveal.js/plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } }
+        				,{ src: './reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } }
+        				,{ src: './reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        				,{ src: './reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } }
+        				,{ src: './reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+        				// { src: './reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; } }
+        				// { src: './reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+         				
+        			]
+        		});
+</script>
+</body>
+</html>

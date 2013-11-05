@@ -1,0 +1,189 @@
+  #+Title: Clojurescript + Three.js
+  #+Author:
+  #+Email:  @henrygarner
+
+#+REVEAL_EXTRA_CSS: css/zenburn.css
+#+REVEAL_THEME: solarized
+#+OPTIONS: num:nil toc:nil reveal_mathjax:t
+#+REVEAL_TRANS: cube
+
+* The creative process
+[[./images/the-creative-process.gif]]
+* Dojo #1
+
+* Torus Pong
+A Clojure Cup 2013 contribution by:
+
+Jon Neale, Paul Lam, Thomas Kristensen, Ragnar Dahlen
+
+https://github.com/uswitch/torus-pong
+
+[[./images/pong_med.png]]
+
+* Multisnake
+  
+Dave Snowdon, Nikita Beloglazov
+
+[[https://github.com/davesnowdon/multisnake]]
+
+[[./images/multisnake.png]]
+
+* State machine
+  [[./images/game-state.png]]
+
+* Multi-client
+  [[./images/game-state-2.png]]
+
+* Game Tick
+  #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+  (go
+    (loop [game-state game-core/initial-game-state
+           commands   []
+           timer      (timeout (long params/tick-ms))]
+            (let [[v c] (alts! [timer command-chan] :priority true)]
+              (condp = c
+                command-chan (when v
+                               (recur game-state (conj commands v) timer))
+                timer (let [updated-game-state
+                              (game-core/advance game-state commands)]
+                        (>! game-state-channel updated-game-state)
+                        (recur updated-game-state
+                               []
+                               (timeout (long params/tick-ms))))))))
+  </code></pre>
+  #+END_HTML
+* Handling Commands
+  #+BEGIN_HTML
+<pre><code data-trim class="clojure">
+  (defn advance
+    "Given a game-state and some inputs
+     advance the game-state one tick"
+    [game-state commands]
+    (let [new-game-state (-> game-state
+                             (handle-commands commands))]
+      (update-world new-game-state)))
+  </code></pre>
+  #+END_HTML
+* Dojo #2
+* Three.js
+  [[./images/threejs.png]]
+* Minecraft - Voxels
+  [[./images/Minecraft-360.jpg]]
+* Clojurescript
+  [[./images/ndc.png]]
+* Three components
+  - Scene
+  - Mesh
+  - Camera
+  - Renderer (WebGL or Canvas)
+* Meshes
+#+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+(let [scene    (THREE/Scene.)
+      geometry (THREE/CubeGeometry. 10 10 10)
+      material (THREE/MeshBasicMaterial.
+                 (clj->js {:wireframe true :color 0x000000}))]
+  (.add scene (THREE/Mesh. geometry material)))
+</code></pre>
+  #+END_HTML
+* Camera
+  #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+  ;; Frustrum left, right, top, bottom, near and far planes
+
+  (let [scene  (THREE/Scene.)
+        camera (THREE/OrthographicCamera. (/ width -2) (/ width 2)
+			                  (/ height 2) (/ height -2)
+                                          1 1000)]
+    (.add scene camera))
+  </code></pre>
+  #+END_HTML
+* Renderer
+  #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+  ;; Three.js can render using WebGL or 2D Canvas API
+  
+  (let [renderer (if (.WebGLRenderingContext js/window)
+                   (THREE/WebGLRenderer.)
+                   (THREE/CanvasRenderer.))]
+    (.render renderer scene camera))
+  </code></pre>
+  #+END_HTML
+* Fez - Trixels
+  [[./images/fez.png]]
+* Orthographic Camera
+  [[./images/ortho.png]]
+* Tween.js
+  #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+  ;; Use less energy
+
+(defn animate [scene camera renderer]
+  (js/requestAnimationFrame #(animate scene camera renderer))
+  (.render renderer scene camera)
+  (.update js/TWEEN))
+  </code></pre>
+  #+END_HTML
+* Stateless Client
+  #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+  {:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
+             :dir [0 1 0]
+             :id 4
+             :orientation 1}]
+   :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
+  </code></pre>
+  #+END_HTML
+  
+* Demo
+  [[./images/3dsnake.png]]
+* Foreign Libs
+  #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+;; Inside project.clj
+
+:foreign-libs [{:file "resources/public/three.max.js"
+              :provides ["three"]}
+             {:file "resources/public/tween.max.js"
+              :provides ["tween"]}]
+
+;; Inside cljs source
+
+(ns multiplay.views.arena
+  (:require [three]
+            [tween]))
+</code></pre>
+#+END_HTML
+* Advanced mode
+  #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+  ;; Inside project.clj
+  
+  :optimizations :advanced
+  :externs ["resources/public/three.extern.js"
+            "resources/public/tween.extern.js"]
+  </code></pre>
+  #+END_HTML
+  
+  #+BEGIN_HTML
+  <pre><code data-trim class="bash">
+  # lein cljsbuild
+  
+  com.google.javascript.jscomp.LoggerErrorManager printSummary
+  WARNING: 0 error(s), 19,434 warning(s)
+  </code></pre>
+  #+END_HTML
+  
+
+  1. 2.0MB raw
+  2. 650K  pruned
+  3. 130K  pruned + gzipped
+  
+* Thank You
+  [[https://github.com/henrygarner/ldnclj-talk-nov-2013]]
+  [[./images/henrygarner.jpeg]]
+
+  @henrygarner
+
+  CTO, Likely
