@@ -28,6 +28,8 @@ Dave Snowdon, Nikita Beloglazov
 
 [[./images/multisnake.png]]
 
+* Massive Multiplayer Online 3D Snake!
+  [[./images/snake-3d.png]]
 * State machine
   [[./images/game-state.png]]
 
@@ -53,31 +55,39 @@ Dave Snowdon, Nikita Beloglazov
                                (timeout (long params/tick-ms))))))))
   </code></pre>
   #+END_HTML
-* Handling Commands
-  #+BEGIN_HTML
-<pre><code data-trim class="clojure">
-  (defn advance
-    "Given a game-state and some inputs
-     advance the game-state one tick"
-    [game-state commands]
-    (let [new-game-state (-> game-state
-                             (handle-commands commands))]
-      (update-world new-game-state)))
+* On the client
+ #+BEGIN_HTML
+  <pre><code data-trim class="clojure">
+  {:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
+             :dir [0 1 0]
+             :id 4
+             :orientation 1}]
+   :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
   </code></pre>
   #+END_HTML
+
+  #+BEGIN_HTML
+<pre><code data-trim class="clojure">
+  (go (loop [previous-arena (make-arena quaternion)]
+          (let [game-state (&lt;! c)
+                new-arena (make-arena quaternion)]
+            (.remove scene previous-arena)
+            (draw-game-state new-arena game-state)
+            (.add scene new-arena)
+            (recur new-arena))))
+</code></pre>
+  #+END_HTML 
 * Dojo #2
 * Three.js
   [[./images/threejs.png]]
 * Minecraft - Voxels
   [[./images/Minecraft-360.jpg]]
-* Clojurescript
-  [[./images/ndc.png]]
-* Three components
+* Three.js components
   - Scene
   - Mesh
   - Camera
   - Renderer (WebGL or Canvas)
-* Meshes
+* Three.js components
 #+BEGIN_HTML
   <pre><code data-trim class="clojure">
 (let [scene    (THREE/Scene.)
@@ -87,7 +97,7 @@ Dave Snowdon, Nikita Beloglazov
   (.add scene (THREE/Mesh. geometry material)))
 </code></pre>
   #+END_HTML
-* Camera
+
   #+BEGIN_HTML
   <pre><code data-trim class="clojure">
   ;; Frustrum left, right, top, bottom, near and far planes
@@ -99,7 +109,7 @@ Dave Snowdon, Nikita Beloglazov
     (.add scene camera))
   </code></pre>
   #+END_HTML
-* Renderer
+
   #+BEGIN_HTML
   <pre><code data-trim class="clojure">
   ;; Three.js can render using WebGL or 2D Canvas API
@@ -114,30 +124,6 @@ Dave Snowdon, Nikita Beloglazov
   [[./images/fez.png]]
 * Orthographic Camera
   [[./images/ortho.png]]
-* Tween.js
-  #+BEGIN_HTML
-  <pre><code data-trim class="clojure">
-  ;; Use less energy
-
-(defn animate [scene camera renderer]
-  (js/requestAnimationFrame #(animate scene camera renderer))
-  (.render renderer scene camera)
-  (.update js/TWEEN))
-  </code></pre>
-  #+END_HTML
-* Stateless Client
-  #+BEGIN_HTML
-  <pre><code data-trim class="clojure">
-  {:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
-             :dir [0 1 0]
-             :id 4
-             :orientation 1}]
-   :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
-  </code></pre>
-  #+END_HTML
-  
-* Demo
-  [[./images/3dsnake.png]]
 * Foreign Libs
   #+BEGIN_HTML
   <pre><code data-trim class="clojure">

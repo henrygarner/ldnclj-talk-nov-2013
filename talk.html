@@ -71,19 +71,27 @@ Dave Snowdon, Nikita Beloglazov
 <section>
 <section id="sec-5" >
 
+<h2>Massive Multiplayer Online 3D Snake</h2>
+<img src="./images/snake-3d.png" alt="snake-3d.png" />
+</section>
+
+</section>
+<section>
+<section id="sec-6" >
+
 <h2>State machine</h2>
 <img src="./images/game-state.png" alt="game-state.png" />
 </section>
 </section>
 <section>
-<section id="sec-6" >
+<section id="sec-7" >
 
 <h2>Multi-client</h2>
 <img src="./images/game-state-2.png" alt="game-state-2.png" />
 </section>
 </section>
 <section>
-<section id="sec-7" >
+<section id="sec-8" >
 
 <h2>Game Tick</h2>
 <pre><code data-trim class="clojure">
@@ -106,29 +114,37 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-8" >
+<section id="sec-9" >
 
-<h2>Handling Commands</h2>
+<h2>On the client</h2>
 <pre><code data-trim class="clojure">
-  (defn advance
-    "Given a game-state and some inputs
-     advance the game-state one tick"
-    [game-state commands]
-    (let [new-game-state (-> game-state
-                             (handle-commands commands))]
-      (update-world new-game-state)))
-  </code></pre>
+{:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
+           :dir [0 1 0]
+           :id 4
+           :orientation 1}]
+ :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
+</code></pre>
+
+<pre><code data-trim class="clojure">
+  (go (loop [previous-arena (make-arena quaternion)]
+          (let [game-state (&lt;! c)
+                new-arena (make-arena quaternion)]
+            (.remove scene previous-arena)
+            (draw-game-state new-arena game-state)
+            (.add scene new-arena)
+            (recur new-arena))))
+</code></pre>
 </section>
 
 </section>
 <section>
-<section id="sec-9" >
+<section id="sec-10" >
 
 <h2>Dojo #2</h2>
 </section>
 </section>
 <section>
-<section id="sec-10" >
+<section id="sec-11" >
 
 <h2>Three.js</h2>
 <img src="./images/threejs.png" alt="threejs.png" />
@@ -136,7 +152,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-11" >
+<section id="sec-12" >
 
 <h2>Minecraft - Voxels</h2>
 <img src="./images/Minecraft-360.jpg" alt="Minecraft-360.jpg" />
@@ -144,17 +160,9 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-12" >
-
-<h2>Clojurescript</h2>
-<img src="./images/ndc.png" alt="ndc.png" />
-</section>
-
-</section>
-<section>
 <section id="sec-13" >
 
-<h2>Three components</h2>
+<h2>Three.js components</h2>
 <ul class="org-ul">
 <li>Scene
 </li>
@@ -171,7 +179,7 @@ Dave Snowdon, Nikita Beloglazov
 <section>
 <section id="sec-14" >
 
-<h2>Meshes</h2>
+<h2>Three.js components</h2>
   <pre><code data-trim class="clojure">
 (let [scene    (THREE/Scene.)
       geometry (THREE/CubeGeometry. 10 10 10)
@@ -179,13 +187,7 @@ Dave Snowdon, Nikita Beloglazov
                  (clj->js {:wireframe true :color 0x000000}))]
   (.add scene (THREE/Mesh. geometry material)))
 </code></pre>
-</section>
 
-</section>
-<section>
-<section id="sec-15" >
-
-<h2>Camera</h2>
 <pre><code data-trim class="clojure">
 ;; Frustrum left, right, top, bottom, near and far planes
 
@@ -195,13 +197,7 @@ Dave Snowdon, Nikita Beloglazov
                                         1 1000)]
   (.add scene camera))
 </code></pre>
-</section>
 
-</section>
-<section>
-<section id="sec-16" >
-
-<h2>Renderer</h2>
 <pre><code data-trim class="clojure">
 ;; Three.js can render using WebGL or 2D Canvas API
 
@@ -214,7 +210,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-17" >
+<section id="sec-15" >
 
 <h2>Fez - Trixels</h2>
 <img src="./images/fez.png" alt="fez.png" />
@@ -222,7 +218,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-18" >
+<section id="sec-16" >
 
 <h2>Orthographic Camera</h2>
 <img src="./images/ortho.png" alt="ortho.png" />
@@ -230,43 +226,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-19" >
-
-<h2>Tween.js</h2>
-  <pre><code data-trim class="clojure">
-  ;; Use less energy
-
-(defn animate [scene camera renderer]
-  (js/requestAnimationFrame #(animate scene camera renderer))
-  (.render renderer scene camera)
-  (.update js/TWEEN))
-  </code></pre>
-</section>
-
-</section>
-<section>
-<section id="sec-20" >
-
-<h2>Stateless Client</h2>
-<pre><code data-trim class="clojure">
-{:snakes [{:body ([19 9 15] [19 8 15] [19 7 15])
-           :dir [0 1 0]
-           :id 4
-           :orientation 1}]
- :apples #{[14 14 6] [7 18 19] [2 4 17] [19 15 17]}}
-</code></pre>
-</section>
-</section>
-<section>
-<section id="sec-21" >
-
-<h2>Demo</h2>
-<img src="./images/3dsnake.png" alt="3dsnake.png" />
-</section>
-
-</section>
-<section>
-<section id="sec-22" >
+<section id="sec-17" >
 
 <h2>Foreign Libs</h2>
   <pre><code data-trim class="clojure">
@@ -287,7 +247,7 @@ Dave Snowdon, Nikita Beloglazov
 
 </section>
 <section>
-<section id="sec-23" >
+<section id="sec-18" >
 
 <h2>Advanced mode</h2>
 <pre><code data-trim class="clojure">
@@ -317,7 +277,7 @@ WARNING: 0 error(s), 19,434 warning(s)
 </section>
 </section>
 <section>
-<section id="sec-24" >
+<section id="sec-19" >
 
 <h2>Thank You</h2>
 <p>
